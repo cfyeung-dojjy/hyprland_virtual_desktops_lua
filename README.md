@@ -8,8 +8,19 @@ Luckily, the newly adopted lua scripting functionality allows us to write a repl
 
 <mark>warning, this will unbind all your existing SUPER+num and SUPER+shift+num bindings</mark>
 
-1. Add this repository to your hyprland config directory. (I recommend adding this as a submodule in your dotfiles repository)
-2. In your `hyprland.lua`, add the following line:
+1. Setup your workspace-monitor assignments with workspace_rules, here is my setup:
+```lua
+for i = 1, 10 do
+    hl.workspace_rule({ workspace = i, monitor = main_monitor, default = (i == 1) })
+end
+
+for i = 11, 20 do
+    hl.workspace_rule({ workspace = i, monitor = left_monitor, default = (i == 11) })
+end
+
+```
+2. Add this repository to your hyprland config directory. (I recommend adding this as a submodule in your dotfiles repository)
+3. In your `hyprland.lua`, add the following line:
 ```lua
 -- incase the virtual_desktops module fails to load, fall back to default settings
 local ok, module = pcall(require, "/path/to/virtual_desktops.lua")
