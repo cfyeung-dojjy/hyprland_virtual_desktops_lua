@@ -3,7 +3,11 @@ local mainMod = "SUPER" -- change me if you use a different key as mainMod
 local workspaces_per_monitor = 10
 
 -- make sure it works as expected when hyprland reloads on whatever workspace you are on
-local current_virtual_desktop_id = hl.get_active_workspace().id % workspaces_per_monitor
+if hl.get_active_workspace() then
+    local current_virtual_desktop_id = hl.get_active_workspace().id % workspaces_per_monitor
+else
+    local current_virtual_desktop_id = 1
+end
 
 -- Unbind existing
 for virtual_desktop_id = 1, workspaces_per_monitor do
