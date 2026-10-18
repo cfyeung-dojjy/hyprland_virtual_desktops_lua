@@ -64,7 +64,13 @@ for virtual_desktop_id = 1, workspaces_per_monitor do
             target_workspace = (current_workspace_id + workspaces_per_monitor) %
                 (#hl.get_monitors() * workspaces_per_monitor)
         end
-        hl.dispatch(hl.dsp.window.move({ workspace = target_workspace }))
+
+        -- local current_window_size = hl.get_active_window().size
+        -- hl.dispatch(hl.dsp.window.move({ workspace = target_workspace }))
+        -- if not hl.get_active_window().floating then
+        --     -- When moving floating windows, their size is preserved, but not tiled windows
+        --     hl.dispatch(hl.dsp.window.resize({}))
+        -- end
 
         focus_on_virtual_desktop(virtual_desktop_id)
     end)
