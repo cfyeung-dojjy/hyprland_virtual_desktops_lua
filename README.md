@@ -60,3 +60,9 @@ With this setup, you can move virtual desktops using the SUPER+shift+num keys. I
 #### If you are already on the desired workspace
 
 This will move the window to the next monitor.
+
+### On pressing SUPER+TAB / SUPER+shift+TAB
+
+SUPER+TAB focuses the next monitor, SUPER+shift+TAB focuses the previous monitor (wrapping around), staying on the same virtual desktop. Monitor order follows your workspace groups, i.e. workspaces 1-10 are monitor 1, 11-20 are monitor 2, etc.
+
+<mark>warning, this will unbind your existing SUPER+TAB and SUPER+shift+TAB bindings</mark>
