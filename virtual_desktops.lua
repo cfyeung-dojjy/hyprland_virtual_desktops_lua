@@ -15,6 +15,8 @@ for virtual_desktop_id = 1, workspaces_per_monitor do
     hl.unbind(mainMod .. " + " .. key)
     hl.unbind(mainMod .. " + SHIFT + " .. key)
 end
+hl.unbind(mainMod .. " + TAB")
+hl.unbind(mainMod .. " + SHIFT + TAB")
 
 local function focus_on_virtual_desktop(i)
     local monitors = #hl.get_monitors()
@@ -39,12 +41,21 @@ local function focus_on_virtual_desktop(i)
     current_virtual_desktop_id = i
 end
 
-local function focus_next_monitor()
+-- direction: 1 for next monitor, -1 for previous monitor (wraps around)
+local function focus_monitor(direction)
     local current_workspace_id = hl.get_active_workspace().id
-    local next_workspace_id = (current_workspace_id + workspaces_per_monitor) %
-        (#hl.get_monitors() * workspaces_per_monitor)
-    hl.dispatch(hl.dsp.focus({ workspace = next_workspace_id }))
+    local monitor_idx = (current_workspace_id - 1) // workspaces_per_monitor
+    local virtual_desktop_id = (current_workspace_id - 1) % workspaces_per_monitor + 1
+    local target_monitor_idx = (monitor_idx + direction) % #hl.get_monitors()
+    hl.dispatch(hl.dsp.focus({ workspace = target_monitor_idx * workspaces_per_monitor + virtual_desktop_id }))
 end
+
+local function focus_next_monitor()
+    focus_monitor(1)
+end
+
+hl.bind(mainMod .. " + TAB", function() focus_monitor(1) end)
+hl.bind(mainMod .. " + SHIFT + TAB", function() focus_monitor(-1) end)
 
 for virtual_desktop_id = 1, workspaces_per_monitor do
     local key = virtual_desktop_id % workspaces_per_monitor
