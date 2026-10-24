@@ -17,8 +17,14 @@ local function workspace_id(monitor_idx, virtual_desktop_id)
     return monitor_idx * config.workspaces_per_monitor + virtual_desktop_id
 end
 
+-- Whether the focused workspace belongs to virtual desktop i.
+function M.is_on_virtual_desktop(i)
+    local active = hl.get_active_workspace()
+    return active ~= nil and select(2, position(active.id)) == i
+end
+
 -- Switch every monitor to virtual desktop i, keeping the focused monitor and cursor position.
-function M.focus_virtual_desktop(i)
+function M.switch(i)
     local active = hl.get_active_workspace()
     if active == nil then
         return
@@ -50,29 +56,9 @@ function M.focus_monitor(direction)
     hl.dispatch(hl.dsp.focus({ workspace = workspace_id(target_idx, virtual_desktop_id) }))
 end
 
--- Switch to virtual desktop i; if already on it, focus the next monitor instead.
-function M.switch(i)
-    local active = hl.get_active_workspace()
-    if active ~= nil and select(2, position(active.id)) == i then
-        M.focus_monitor(1)
-    else
-        M.focus_virtual_desktop(i)
-    end
-end
-
--- Move the active window to virtual desktop i on the current monitor; if already on it,
--- move the window to the next monitor instead.
-function M.move_window(i)
-    local active = hl.get_active_workspace()
-    if active == nil then
-        return
-    end
-    local monitor_idx = position(active.id)
-    local target = workspace_id(monitor_idx, i)
-    if target == active.id then
-        target = workspace_id((monitor_idx + 1) % #hl.get_monitors(), i)
-    end
-
+-- Move the active window to workspace target, then switch to virtual desktop i so every
+-- monitor stays on the same desktop and focus returns to the current monitor.
+local function move_window_to(target, i)
     hl.dispatch(hl.dsp.window.move({ workspace = target }))
 
     -- local current_window_size = hl.get_active_window().size
@@ -81,7 +67,29 @@ function M.move_window(i)
     --     hl.dispatch(hl.dsp.window.resize({}))
     -- end
 
-    M.focus_virtual_desktop(i)
+    M.switch(i)
+end
+
+-- Move the active window to virtual desktop i on the current monitor.
+function M.move_window(i)
+    local active = hl.get_active_workspace()
+    if active == nil then
+        return
+    end
+    local monitor_idx = position(active.id)
+    move_window_to(workspace_id(monitor_idx, i), i)
+end
+
+-- Move the active window to the next (direction = 1) or previous (direction = -1) monitor,
+-- staying on the same virtual desktop. Wraps around.
+function M.move_window_to_monitor(direction)
+    local active = hl.get_active_workspace()
+    if active == nil then
+        return
+    end
+    local monitor_idx, virtual_desktop_id = position(active.id)
+    local target_idx = (monitor_idx + direction) % #hl.get_monitors()
+    move_window_to(workspace_id(target_idx, virtual_desktop_id), virtual_desktop_id)
 end
 
 -- Binds no keys; bind the functions above yourself.

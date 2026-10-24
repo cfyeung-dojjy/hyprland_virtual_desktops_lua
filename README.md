@@ -27,8 +27,22 @@ end)
 if ok then
     for i = 1, 10 do
         local key = i % 10
-        hl.bind("SUPER + " .. key, function() vd.switch(i) end)
-        hl.bind("SUPER + SHIFT + " .. key, function() vd.move_window(i) end)
+        hl.bind("SUPER + " .. key, function()
+            -- pressing the current desktop's key again jumps to the next monitor
+            if vd.is_on_virtual_desktop(i) then
+                vd.focus_monitor(1)
+            else
+                vd.switch(i)
+            end
+        end)
+        hl.bind("SUPER + SHIFT + " .. key, function()
+            -- moving to the current desktop sends the window to the next monitor
+            if vd.is_on_virtual_desktop(i) then
+                vd.move_window_to_monitor(1)
+            else
+                vd.move_window(i)
+            end
+        end)
     end
     hl.bind("SUPER + TAB", function() vd.focus_monitor(1) end)
     hl.bind("SUPER + SHIFT + TAB", function() vd.focus_monitor(-1) end)
@@ -58,10 +72,11 @@ end
 
 | Function | Description |
 | --- | --- |
-| `switch(i)` | Switch to virtual desktop `i`; if already on it, focus the next monitor |
-| `move_window(i)` | Move the active window to virtual desktop `i` on the current monitor; if already on it, move the window to the next monitor |
+| `switch(i)` | Switch every monitor to virtual desktop `i`, keeping the focused monitor and cursor position |
+| `is_on_virtual_desktop(i)` | Whether the focused workspace belongs to virtual desktop `i` |
+| `move_window(i)` | Move the active window to virtual desktop `i` on the current monitor |
+| `move_window_to_monitor(direction)` | Move the active window to the next (`1`) or previous (`-1`) monitor, staying on the same virtual desktop. Wraps around |
 | `focus_monitor(direction)` | Focus the next (`1`) or previous (`-1`) monitor, staying on the same virtual desktop. Wraps around |
-| `focus_virtual_desktop(i)` | Switch every monitor to virtual desktop `i`, without the "next monitor" behaviour of `switch` |
 
 ## Functionalities
 
